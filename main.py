@@ -13,20 +13,17 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
 from astrbot.api.event import filter, AstrMessageEvent
+from astrbot.api.event.filter import PermissionType
 from astrbot.api.star import Context, Star
 from astrbot.api import logger
 from astrbot.api.message_components import Image, Plain
 
 
 class KugouMusic(Star):
-    # Default port for the local image server (auto-pick if in use)
-    _IMG_SERVER_PORT = 34567
-
     def __init__(self, context: Context, config: dict):
         super().__init__(context)
         self.config = config
         self._session: aiohttp.ClientSession = None
-        self._img_server_port = None  # populated in initialize()
 
         # Persistent cache - store search results to disk as user requested
         self._cache_dir = os.path.join(
@@ -37,8 +34,6 @@ class KugouMusic(Star):
         self._search_cache = self._load_cache()
         self._cache_ttl = 300  # 5 minutes
         self._debug = []
-        # start local image server so QR/image files can be served as http URLs
-        self._start_img_server()
 
     # ── cache helpers ──────────────────────────────────────────
 
@@ -773,48 +768,6 @@ class KugouMusic(Star):
 
     # ── inline QR login (self-contained, no external service) ───
 
-    def _start_img_server(self):
-        """Start a tiny HTTP server on a free port to serve images (QR codes) as URLs.
-        NapCat can fetch http URLs but rejects raw base64/base64:// data.
-        Server runs in a daemon thread and dies with the plugin.
-        """
-        try:
-            import http.server
-            import socketserver
-            import threading
-            import socket
-
-            class _Handler(http.server.SimpleHTTPRequestHandler):
-                def __init__(self, *args, **kwargs):
-                    super().__init__(*args, directory=self._cache_dir, **kwargs)
-                def log_message(self, *args, **kwargs):
-                    pass  # silence
-
-            # Try preferred port first, fall back to OS-assigned
-            for port in (self._IMG_SERVER_PORT, 0):
-                try:
-                    sock = socket.socket()
-                    sock.bind(("127.0.0.1", port))
-                    port = sock.getsockname()[1]
-                    sock.close()
-                    httpd = socketserver.TCPServer(("127.0.0.1", port), _Handler)
-                    httpd.allow_reuse_address = True
-                    threading.Thread(target=httpd.serve_forever, daemon=True).start()
-                    self._img_server_port = port
-                    logger.info(f"[kugou] img server on http://127.0.0.1:{port}")
-                    return
-                except OSError:
-                    continue
-        except Exception as e:
-            logger.warning(f"[kugou] img server failed: {e}")
-            self._img_server_port = None
-
-    def _local_img_url(self, filename: str) -> str:
-        """Return http URL for a local image, if server is up."""
-        if not self._img_server_port:
-            return ""
-        return f"http://127.0.0.1:{self._img_server_port}/{filename}"
-
     # Constants for Kugou web signature (matches KuGouMusicApi util/helper.js)
     _WEB_SIGN_SALT = "NVPh5oo715z5DIWAeQlhMDsWXXQV4hwt"
     _QR_APPID = 1001            # for /v2/qrcode appid param (overrides default)
@@ -945,6 +898,7 @@ class KugouMusic(Star):
             logger.debug(f"[kugou] qr/check error: {e}")
             return -1  # transient
 
+    @filter.permission_type(PermissionType.ADMIN)
     @filter.command("酷狗扫码登录")
     async def cmd_qr_login(self, event: AstrMessageEvent):
         """Inline QR login — auto-switches to Android channel when concept mode is on."""
@@ -1292,6 +1246,7 @@ class KugouMusic(Star):
             logger.warning(f"[kugou] wx openplat error: {e}")
             return "", ""
 
+    @filter.permission_type(PermissionType.ADMIN)
     @filter.command("酷狗微信登录")
     async def cmd_wx_login(self, event: AstrMessageEvent):
         """微信授权登录酷狗：生成微信链接 → 复制到微信打开 → 自动换 Cookie。
@@ -1403,12 +1358,14 @@ class KugouMusic(Star):
             f"Cookie 已自动保存，立即可用。"
         )
 
+    @filter.permission_type(PermissionType.ADMIN)
     @filter.command("酷狗退出登录")
     async def cmd_logout(self, event: AstrMessageEvent):
         """Clear saved cookie."""
         self._clear_cookie()
         yield event.plain_result("✅ 已退出登录，Cookie 已清除。")
 
+    @filter.permission_type(PermissionType.ADMIN)
     @filter.command("酷狗登录状态")
     async def cmd_login_status(self, event: AstrMessageEvent):
         """Show current login status."""
