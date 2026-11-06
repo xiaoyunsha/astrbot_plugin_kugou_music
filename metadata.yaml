@@ -9,7 +9,7 @@ desc: |
   - VIP 歌曲：配置 Cookie 后走 v5/url 拿 VIP 直链
   - 音乐卡片：优先 OIAPI 签名（免费，概念版走 kugoulite）→ 咸鱼 API → NapCat 原生 music 段兜底，秒发不超时
   - WebUI 可切换标准版 / 酷狗概念版（Lite）双协议
-version: 1.7.4
+version: 1.7.5
 author: xiaoyunsha
 repo: https://github.com/xiaoyunsha/astrbot_plugin_kugou_music
 astrbot_version: ">=4.17.0"
@@ -17,6 +17,7 @@ support_platforms:
   - aiocqhttp
   - qq_official
 social_link: https://github.com/xiaoyunsha
+category: 娱乐
 tags:
   - 音乐
   - 点歌
