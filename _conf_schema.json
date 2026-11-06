@@ -1,0 +1,66 @@
+{
+  "kugou_cookie": {
+    "description": "酷狗App登录Cookie",
+    "type": "text",
+    "hint": "通过 kg-login.html 登录获取的 cookie_string（含 token、userid、vip_token）。免费歌曲无需填写，VIP歌曲必填。开箱即用，无需部署额外服务。",
+    "obvious_hint": true,
+    "default": ""
+  },
+  "kugou_concept": {
+    "description": "使用酷狗概念版 (Lite)",
+    "type": "bool",
+    "default": false,
+    "hint": "开启后扫码登录走酷狗概念版（appid=3116, clientver=11440），独立 token 体系，理论上不影响标准版 PC/手机登录。普通用户保持关闭即可。",
+    "obvious_hint": true
+  },
+  "kugou_ua": {
+    "description": "User-Agent",
+    "type": "string",
+    "hint": "自定义请求UA标识，用于反爬虫检测。留空则使用默认Chrome UA。",
+    "default": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+  },
+  "search_count": {
+    "description": "搜索结果数量",
+    "type": "int",
+    "hint": "每次搜索返回的歌曲数量 (1-10)",
+    "default": 5,
+    "slider": {
+      "min": 1,
+      "max": 10,
+      "step": 1
+    }
+  },
+  "debug": {
+    "description": "调试模式",
+    "type": "bool",
+    "hint": "开启后在聊天消息末尾输出 _debug JSON 数组，方便排查问题。日志为英文。",
+    "default": false
+  },
+  "card_jump": {
+    "description": "音乐卡片跳转目标",
+    "type": "string",
+    "default": "detail",
+    "values": ["detail", "audio"],
+    "hint": "detail=跳转酷狗歌曲详情页（推荐，避免版权风险）, audio=跳转音频直链播放"
+  },
+  "music_card_key": {
+    "description": "音乐卡片签名Token（咸鱼API）",
+    "type": "text",
+    "hint": "在 https://apii.xianyuw.cn 注册登录后，个人中心获取 Token 填入。填入后生成官方签名音乐卡片（com.tencent.music.lua，QQ内可直接播放）。留空则使用插件本地构造的卡片。",
+    "obvious_hint": true,
+    "default": ""
+  },
+  "card_format": {
+    "description": "卡片平台标识",
+    "type": "string",
+    "default": "kugou",
+    "values": ["kugou", "netease"],
+    "hint": "kugou=显示为酷狗音乐卡片, netease=显示为网易云音乐卡片（若 kugou 标识不被签名服务支持可改用此项）"
+  },
+  "timeout": {
+    "description": "请求超时(秒)",
+    "type": "int",
+    "hint": "HTTP请求超时时间，建议10-30秒",
+    "default": 15
+  }
+}

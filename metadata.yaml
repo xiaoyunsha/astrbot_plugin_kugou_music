@@ -1,0 +1,25 @@
+name: astrbot_plugin_kugou_music
+display_name: 酷狗音乐点歌
+short_desc: 纯酷狗点歌插件：搜索/点歌/VIP直取/扫码+微信登录/原生音乐卡片
+desc: |
+  纯酷狗音乐点歌插件，不依赖第三方 API 中转。
+
+  - 搜索 + 点歌：`/酷狗搜歌 <关键词>` → `/酷狗点歌 <序号>`
+  - 三种登录方式：`/酷狗扫码登录`（通用）、`/酷狗微信登录`（仅概念版/安卓渠道，链接 1 分 50 秒自动撤回）、WebUI 手动填 Cookie
+  - VIP 歌曲：配置 Cookie 后走 v5/url 拿 VIP 直链
+  - 音乐卡片：优先 OIAPI 签名（免费，概念版走 kugoulite）→ 咸鱼 API → NapCat 原生 music 段兜底，秒发不超时
+  - WebUI 可切换标准版 / 酷狗概念版（Lite）双协议
+version: 1.7.4
+author: xiaoyunsha
+repo: https://github.com/xiaoyunsha/astrbot_plugin_kugou_music
+astrbot_version: ">=4.17.0"
+support_platforms:
+  - aiocqhttp
+  - qq_official
+social_link: https://github.com/xiaoyunsha
+tags:
+  - 音乐
+  - 点歌
+  - 酷狗
+  - 娱乐
+  - QQ音乐卡片
